@@ -67,25 +67,57 @@ function initializeApp() {
     }
 
     // Quality button event listeners
-    document.querySelectorAll('.quality-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const quality = this.dataset.quality;
-            downloadVideo(quality);
+    const qualityButtons = document.querySelectorAll('.quality-btn');
+    if (qualityButtons.length > 0) {
+        qualityButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const quality = this.dataset.quality;
+                downloadVideo(quality);
+            });
         });
-    });
+    }
+
+    // Dropdown navigation handling
+    const dropdownToggles = document.querySelectorAll('.nav-dropdown-toggle');
+    if (dropdownToggles.length > 0) {
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                // On mobile, toggle the dropdown
+                if (window.innerWidth <= 768) {
+                    const dropdown = this.parentElement;
+                    const menu = dropdown.querySelector('.nav-dropdown-menu');
+                    if (menu) {
+                        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                    }
+                }
+            });
+        });
+    }
 
     // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    if (anchorLinks.length > 0) {
+        anchorLinks.forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
         });
+    }
+
+    // Close mobile navigation when clicking outside
+    document.addEventListener('click', function(e) {
+        if (hamburger && navMenu && !hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+        }
     });
 }
 
