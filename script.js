@@ -1,4 +1,3 @@
-
 // Global Variables
 let currentVideoData = null;
 
@@ -62,9 +61,9 @@ function toggleMobileNav() {
 function validateInput() {
     const url = urlInput.value.trim();
     const isValidInstagramUrl = isValidInstagramURL(url);
-    
+
     downloadBtn.disabled = !isValidInstagramUrl;
-    
+
     if (url && !isValidInstagramUrl) {
         showError('Please enter a valid Instagram URL');
     } else {
@@ -79,18 +78,18 @@ function isValidInstagramURL(url) {
 
 async function handleDownload() {
     const url = urlInput.value.trim();
-    
+
     if (!isValidInstagramURL(url)) {
         showError('Please enter a valid Instagram URL');
         return;
     }
 
     showLoading();
-    
+
     try {
         // Simulate API call to process Instagram URL
         await simulateVideoProcessing(url);
-        
+
         // For demo purposes, we'll show a sample result
         const videoData = {
             videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
@@ -98,10 +97,10 @@ async function handleDownload() {
             title: 'Instagram Video',
             duration: '0:30'
         };
-        
+
         currentVideoData = videoData;
         showResults(videoData);
-        
+
     } catch (error) {
         hideLoading();
         showError('Failed to process the video. Please try again.');
@@ -134,32 +133,32 @@ function hideLoading() {
 
 function showResults(videoData) {
     hideLoading();
-    
+
     // Set video preview
     previewVideo.src = videoData.videoUrl;
     previewVideo.poster = videoData.thumbnail;
-    
+
     // Show results section with animation
     resultsSection.style.display = 'block';
     resultsSection.style.animation = 'fadeInUp 0.6s ease-out';
-    
+
     // Scroll to results
     resultsSection.scrollIntoView({ behavior: 'smooth' });
 }
 
 function downloadVideo(quality) {
     if (!currentVideoData) return;
-    
+
     // Create download link
     const link = document.createElement('a');
     link.href = currentVideoData.videoUrl;
     link.download = `instagram_video_${quality}.mp4`;
     link.style.display = 'none';
-    
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Show success message
     showSuccess(`Video download started in ${quality.toUpperCase()} quality!`);
 }
@@ -173,7 +172,7 @@ function resetDownloader() {
     downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
     clearError();
     clearSuccess();
-    
+
     // Scroll back to top
     document.querySelector('.hero-section').scrollIntoView({ behavior: 'smooth' });
 }
@@ -183,10 +182,10 @@ function showError(message) {
     const errorDiv = document.createElement('div');
     errorDiv.className = 'error-message';
     errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
-    
+
     const downloaderCard = document.querySelector('.downloader-card');
     downloaderCard.appendChild(errorDiv);
-    
+
     setTimeout(clearError, 5000);
 }
 
@@ -202,10 +201,10 @@ function showSuccess(message) {
     const successDiv = document.createElement('div');
     successDiv.className = 'success-message';
     successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-    
+
     const downloaderCard = document.querySelector('.downloader-card');
     downloaderCard.appendChild(successDiv);
-    
+
     setTimeout(clearSuccess, 5000);
 }
 
@@ -222,16 +221,16 @@ window.GlobalDownloader = {
     createDownloader: function(containerId, options = {}) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        
+
         const defaultOptions = {
             placeholder: 'Paste Instagram video URL here...',
             buttonText: 'Download',
             showPreview: true,
             autoReset: false
         };
-        
+
         const config = { ...defaultOptions, ...options };
-        
+
         // Create downloader HTML
         const downloaderHTML = `
             <div class="downloader-card">
@@ -245,7 +244,7 @@ window.GlobalDownloader = {
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="loading-section" style="display: none;">
                     <div class="loading-spinner">
                         <div class="spinner"></div>
@@ -255,7 +254,7 @@ window.GlobalDownloader = {
                         <div class="progress-fill"></div>
                     </div>
                 </div>
-                
+
                 ${config.showPreview ? `
                 <div class="results-section" style="display: none;">
                     <div class="video-preview">
@@ -285,20 +284,20 @@ window.GlobalDownloader = {
                 ` : ''}
             </div>
         `;
-        
+
         container.innerHTML = downloaderHTML;
-        
+
         // Initialize the new downloader instance
         this.initializeDownloaderInstance(container);
     },
-    
+
     initializeDownloaderInstance: function(container) {
         const urlInput = container.querySelector('.url-input');
         const downloadBtn = container.querySelector('.download-btn');
         const loadingSection = container.querySelector('.loading-section');
         const resultsSection = container.querySelector('.results-section');
         const resetBtn = container.querySelector('.reset-btn');
-        
+
         // Add event listeners for this instance
         if (downloadBtn) {
             downloadBtn.addEventListener('click', () => {
@@ -308,13 +307,13 @@ window.GlobalDownloader = {
                 }
             });
         }
-        
+
         if (resetBtn) {
             resetBtn.addEventListener('click', () => {
                 this.resetInstance(container);
             });
         }
-        
+
         if (urlInput) {
             urlInput.addEventListener('input', () => {
                 const url = urlInput.value.trim();
@@ -322,34 +321,34 @@ window.GlobalDownloader = {
             });
         }
     },
-    
+
     processDownload: async function(container, url) {
         const loadingSection = container.querySelector('.loading-section');
         const resultsSection = container.querySelector('.results-section');
         const downloadBtn = container.querySelector('.download-btn');
-        
+
         // Show loading
         downloadBtn.disabled = true;
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         loadingSection.style.display = 'block';
         if (resultsSection) resultsSection.style.display = 'none';
-        
+
         try {
             await simulateVideoProcessing(url);
-            
+
             // Show results if preview is enabled
             if (resultsSection) {
                 const videoData = {
                     videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
                     thumbnail: 'https://via.placeholder.com/400x400/667eea/ffffff?text=Instagram+Video'
                 };
-                
+
                 const video = resultsSection.querySelector('video');
                 if (video) {
                     video.src = videoData.videoUrl;
                     video.poster = videoData.thumbnail;
                 }
-                
+
                 loadingSection.style.display = 'none';
                 resultsSection.style.display = 'block';
             } else {
@@ -357,10 +356,10 @@ window.GlobalDownloader = {
                 this.downloadVideo('hd');
                 loadingSection.style.display = 'none';
             }
-            
+
             downloadBtn.disabled = false;
             downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
-            
+
         } catch (error) {
             loadingSection.style.display = 'none';
             downloadBtn.disabled = false;
@@ -368,13 +367,13 @@ window.GlobalDownloader = {
             console.error('Download error:', error);
         }
     },
-    
+
     resetInstance: function(container) {
         const urlInput = container.querySelector('.url-input');
         const loadingSection = container.querySelector('.loading-section');
         const resultsSection = container.querySelector('.results-section');
         const downloadBtn = container.querySelector('.download-btn');
-        
+
         urlInput.value = '';
         loadingSection.style.display = 'none';
         if (resultsSection) resultsSection.style.display = 'none';
@@ -389,13 +388,13 @@ window.GlobalComponents = {
     createHeader: function(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        
+
         const headerHTML = `
             <header class="global-header">
                 <nav class="nav-container">
                     <div class="logo">
                         <i class="fab fa-instagram"></i>
-                        <span>InstaDownloader</span>
+                        <span>SaveRig</span>
                     </div>
                     <ul class="nav-menu">
                         <li><a href="#home">Home</a></li>
@@ -411,24 +410,24 @@ window.GlobalComponents = {
                 </nav>
             </header>
         `;
-        
+
         container.innerHTML = headerHTML;
-        
+
         // Initialize mobile navigation
         const hamburger = container.querySelector('.hamburger');
         const navMenu = container.querySelector('.nav-menu');
-        
+
         hamburger.addEventListener('click', () => {
             navMenu.classList.toggle('active');
             hamburger.classList.toggle('active');
         });
     },
-    
+
     // Function to create global footer on any page
     createFooter: function(containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
-        
+
         const footerHTML = `
             <footer class="global-footer">
                 <div class="container">
@@ -436,7 +435,7 @@ window.GlobalComponents = {
                         <div class="footer-section">
                             <div class="footer-logo">
                                 <i class="fab fa-instagram"></i>
-                                <span>InstaDownloader</span>
+                                <span>SaveRig</span>
                             </div>
                             <p>The fastest and most reliable Instagram video downloader. Download videos, reels, and IGTV content for free.</p>
                         </div>
@@ -472,7 +471,7 @@ window.GlobalComponents = {
                 </div>
             </footer>
         `;
-        
+
         container.innerHTML = footerHTML;
     }
 };
@@ -483,12 +482,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('global-header-container')) {
         GlobalComponents.createHeader('global-header-container');
     }
-    
+
     // Auto-create footer if container exists
     if (document.getElementById('global-footer-container')) {
         GlobalComponents.createFooter('global-footer-container');
     }
-    
+
     // Auto-create downloader if container exists
     if (document.getElementById('global-downloader-container')) {
         GlobalDownloader.createDownloader('global-downloader-container');
