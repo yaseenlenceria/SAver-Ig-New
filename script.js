@@ -69,6 +69,12 @@ function initializeApp() {
             });
         }
     }, 200);
+}
+
+// Separate handler function for quality buttons
+function handleQualityClick() {
+    const quality = this.dataset.quality;
+    downloadVideo(quality);
 
     // Mobile navigation
     if (hamburger && navMenu) {
@@ -85,16 +91,11 @@ function initializeApp() {
             btn.addEventListener('click', handleQualityClick);
         });
     }
-}
-
-// Separate handler function for quality buttons
-function handleQualityClick() {
-    const quality = this.dataset.quality;
-    downloadVideo(quality);
-}
 
     // Dropdown navigation handling
     const dropdownToggles = document.querySelectorAll('.nav-dropdown-toggle');
+}
+
     if (dropdownToggles.length > 0) {
         dropdownToggles.forEach(toggle => {
             toggle.addEventListener('click', function(e) {
