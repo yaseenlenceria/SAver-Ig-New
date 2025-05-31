@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Downloader App - Web-Based Solution</title>
+    <meta name="description" content="Instagram downloader app that works in your browser. No app store downloads needed. Save Instagram content directly from the web.">
+    <meta name="keywords" content="instagram downloader app, instagram app downloader, web app instagram downloader">
+    <meta name="author" content="SaveRig">
+    <meta property="og:title" content="Instagram Downloader App - Web-Based Solution">
+    <meta property="og:description" content="The best Instagram downloader app experience in your browser without downloading any software.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://saverig.com/instagram-downloader-app">
+    <meta name="google-site-verification" content="RliSr3tglVPiKs7i63gd9a6ZaldmG-QcPnOlLbWnsCE">
+    <link rel="canonical" href="https://saverig.com/instagram-downloader-app">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Global Header -->
+    <div id="global-header"></div>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <h1>Instagram Downloader App</h1>
+                <p class="hero-subtitle">The most powerful Instagram downloader app experience - no installation required, works in any browser!</p>
+                
+                <div class="downloader-container">
+                    <div class="downloader-card">
+                        <div class="input-section">
+                            <div class="input-wrapper">
+                                <i class="fab fa-instagram input-icon"></i>
+                                <input type="url" id="instagram-url" placeholder="Enter Instagram URL to download..." class="url-input">
+                                <button id="download-btn" class="download-btn">
+                                    <i class="fas fa-download"></i>
+                                    Start Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="loading-section" id="loading-section" style="display: none;">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                            <p class="loading-text">App processing your request...</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="results-section" id="results-section" style="display: none;">
+                            <div class="video-preview">
+                                <video id="preview-video" controls poster="">
+                                    <source src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="download-options">
+                                <h3>App Download Options</h3>
+                                <div class="quality-buttons">
+                                    <button class="quality-btn" data-quality="hd">
+                                        <i class="fas fa-video"></i>
+                                        HD Quality
+                                    </button>
+                                    <button class="quality-btn" data-quality="sd">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        Mobile Quality
+                                    </button>
+                                </div>
+                                <button class="reset-btn" id="reset-btn">
+                                    <i class="fas fa-redo"></i>
+                                    Use App Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <h2>Web App vs Mobile App</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-globe"></i>
+                        <h3>No App Store Required</h3>
+                        <p>Access our Instagram downloader directly from your browser without App Store or Play Store downloads.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-sync"></i>
+                        <h3>Always Updated</h3>
+                        <p>No manual app updates needed. Get the latest features automatically every time you visit.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-memory"></i>
+                        <h3>No Storage Space</h3>
+                        <p>Save device storage by using our web-based app instead of installing mobile applications.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Secure & Safe</h3>
+                        <p>No app permissions required. Your privacy and security are protected at all times.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="global-footer"></div>
+    <script src="script.js"></script>
+</body>
+</html>

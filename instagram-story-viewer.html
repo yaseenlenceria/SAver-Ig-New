@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Story Viewer - View Stories Anonymously</title>
+    <meta name="description" content="Anonymous Instagram story viewer. View and download Instagram stories without being detected. Free story viewer with HD download options.">
+    <meta name="keywords" content="instagram story viewer, anonymous story viewer, view instagram stories">
+    <meta name="author" content="SaveRig">
+    <meta property="og:title" content="Instagram Story Viewer - Anonymous & Free">
+    <meta property="og:description" content="View Instagram stories anonymously and download them in HD quality.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://saverig.com/instagram-story-viewer">
+    <meta name="google-site-verification" content="RliSr3tglVPiKs7i63gd9a6ZaldmG-QcPnOlLbWnsCE">
+    <link rel="canonical" href="https://saverig.com/instagram-story-viewer">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Global Header -->
+    <div id="global-header"></div>
+
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <h1>Instagram Story Viewer</h1>
+                <p class="hero-subtitle">View Instagram stories anonymously without leaving any trace. Download stories in HD quality!</p>
+                
+                <div class="downloader-container">
+                    <div class="downloader-card">
+                        <div class="input-section">
+                            <div class="input-wrapper">
+                                <i class="fas fa-eye input-icon"></i>
+                                <input type="text" id="instagram-url" placeholder="Enter Instagram username to view stories..." class="url-input">
+                                <button id="download-btn" class="download-btn">
+                                    <i class="fas fa-eye"></i>
+                                    View Stories
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="loading-section" id="loading-section" style="display: none;">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                            <p class="loading-text">Loading stories anonymously...</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="results-section" id="results-section" style="display: none;">
+                            <div class="video-preview">
+                                <video id="preview-video" controls poster="">
+                                    <source src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="download-options">
+                                <h3>Story Options</h3>
+                                <div class="quality-buttons">
+                                    <button class="quality-btn" data-quality="view">
+                                        <i class="fas fa-eye"></i>
+                                        View Anonymously
+                                    </button>
+                                    <button class="quality-btn" data-quality="download">
+                                        <i class="fas fa-download"></i>
+                                        Download Story
+                                    </button>
+                                </div>
+                                <button class="reset-btn" id="reset-btn">
+                                    <i class="fas fa-redo"></i>
+                                    View More Stories
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <h2>Anonymous Instagram Story Viewer Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-user-secret"></i>
+                        <h3>100% Anonymous</h3>
+                        <p>View Instagram stories without the user knowing you've seen them. Completely invisible viewing.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-download"></i>
+                        <h3>Download & Save</h3>
+                        <p>Save your favorite Instagram stories to your device in original HD quality.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>View Expired Stories</h3>
+                        <p>Access stories that have expired or been deleted from Instagram.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Safe & Secure</h3>
+                        <p>Your viewing activity is completely private and secure. No data stored or tracked.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="global-footer"></div>
+    <script src="script.js"></script>
+</body>
+</html>
