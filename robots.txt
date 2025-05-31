@@ -1,0 +1,43 @@
+
+# Robots.txt for SaveRig.com - Instagram Downloader
+# Generated for maximum SEO performance
+
+User-agent: *
+Allow: /
+
+# Priority crawling for main content
+Allow: /best-instagram-downloader-free
+Allow: /best-video-downloader-free
+Allow: /best-reels-downloader-free
+Allow: /best-photo-downloader-free
+Allow: /best-story-downloader-free
+Allow: /how-to-use
+Allow: /how-to-download-instagram-videos
+Allow: /how-to-download-instagram-photos
+
+# Block unnecessary files to save crawl budget
+Disallow: /script.js
+Disallow: /style.css
+Disallow: /.config/
+Disallow: /.replit
+
+# Google Search Console specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bing specific optimization
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Yandex specific
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 3
+
+# Sitemap location
+Sitemap: https://saverig.com/sitemap.xml
+
+# Additional sitemap for better discovery
+Sitemap: https://saverig.com/sitemap.xml

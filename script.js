@@ -1,4 +1,3 @@
-
 // Global Variables
 let currentVideoData = null;
 
@@ -18,6 +17,11 @@ async function loadComponent(elementId, componentPath) {
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', function() {
+    // Fix for addEventListener error
+    if (!document.getElementById('global-header')) {
+        console.warn('Global header element not found');
+        return;
+    }
     initializeComponents();
 });
 
@@ -25,7 +29,7 @@ async function initializeComponents() {
     // Load header and footer components
     await loadComponent('global-header', 'header.html');
     await loadComponent('global-footer', 'footer.html');
-    
+
     // Initialize app after components are loaded
     setTimeout(() => {
         initializeApp();
@@ -119,14 +123,93 @@ function initializeApp() {
             hamburger.classList.remove('active');
         }
     });
+
+    // SEO and Analytics Enhancements
+
+    // Add structured data for user interactions
+    function trackUserInteraction(action, element) {
+        // Analytics tracking can be added here
+        console.log(`User interaction: ${action} on ${element}`);
+
+        // Send to Google Analytics if available
+        if (typeof gtag !== 'undefined') {
+            gtag('event', action, {
+                'event_category': 'engagement',
+                'event_label': element
+            });
+        }
+    }
+
+    // Track download button clicks
+    const downloadBtnMain = document.getElementById('download-btn');
+    if (downloadBtnMain) {
+        downloadBtnMain.addEventListener('click', function() {
+            trackUserInteraction('download_attempt', 'main_download_button');
+        });
+    }
+
+    // Track quality button selections
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('quality-btn')) {
+            const quality = e.target.getAttribute('data-quality');
+            trackUserInteraction('quality_selection', quality);
+        }
+    });
+
+    // Improve Core Web Vitals - Lazy loading for images
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+
+    // Add schema.org microdata dynamically
+    function addMicrodata() {
+        const downloadButtons = document.querySelectorAll('.download-btn, .quality-btn');
+        downloadButtons.forEach(button => {
+            button.setAttribute('itemprop', 'potentialAction');
+            button.setAttribute('itemscope', '');
+            button.setAttribute('itemtype', 'https://schema.org/DownloadAction');
+        });
+    }
+
+    addMicrodata();
+
+    // Performance monitoring for Core Web Vitals
+    if ('PerformanceObserver' in window) {
+        // Monitor Largest Contentful Paint
+        new PerformanceObserver((entryList) => {
+            for (const entry of entryList.getEntries()) {
+                console.log('LCP:', entry.startTime);
+            }
+        }).observe({entryTypes: ['largest-contentful-paint']});
+
+        // Monitor First Input Delay
+        new PerformanceObserver((entryList) => {
+            for (const entry of entryList.getEntries()) {
+                console.log('FID:', entry.processingStart - entry.startTime);
+            }
+        }).observe({entryTypes: ['first-input']});
+    }
 }
 
 function validateInput() {
     const urlInput = document.getElementById('instagram-url');
     const downloadBtn = document.getElementById('download-btn');
-    
+
     if (!urlInput || !downloadBtn) return;
-    
+
     const url = urlInput.value.trim();
     const isValidInstagramUrl = isValidInstagramURL(url);
 
@@ -147,7 +230,7 @@ function isValidInstagramURL(url) {
 async function handleDownload() {
     const urlInput = document.getElementById('instagram-url');
     if (!urlInput) return;
-    
+
     const url = urlInput.value.trim();
 
     if (!isValidInstagramURL(url)) {
@@ -192,32 +275,32 @@ function showLoading() {
     const downloadBtn = document.getElementById('download-btn');
     const loadingSection = document.getElementById('loading-section');
     const resultsSection = document.getElementById('results-section');
-    
+
     if (downloadBtn) {
         downloadBtn.disabled = true;
         downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     }
-    
+
     if (loadingSection) {
         loadingSection.style.display = 'block';
     }
-    
+
     if (resultsSection) {
         resultsSection.style.display = 'none';
     }
-    
+
     clearError();
 }
 
 function hideLoading() {
     const downloadBtn = document.getElementById('download-btn');
     const loadingSection = document.getElementById('loading-section');
-    
+
     if (downloadBtn) {
         downloadBtn.disabled = false;
         downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
     }
-    
+
     if (loadingSection) {
         loadingSection.style.display = 'none';
     }
@@ -239,7 +322,7 @@ function showResults(videoData) {
     if (resultsSection) {
         resultsSection.style.display = 'block';
         resultsSection.style.animation = 'fadeInUp 0.6s ease-out';
-        
+
         // Scroll to results
         resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
@@ -267,19 +350,19 @@ function resetDownloader() {
     const loadingSection = document.getElementById('loading-section');
     const resultsSection = document.getElementById('results-section');
     const downloadBtn = document.getElementById('download-btn');
-    
+
     if (urlInput) urlInput.value = '';
-    
+
     currentVideoData = null;
-    
+
     if (loadingSection) loadingSection.style.display = 'none';
     if (resultsSection) resultsSection.style.display = 'none';
-    
+
     if (downloadBtn) {
         downloadBtn.disabled = false;
         downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
     }
-    
+
     clearError();
     clearSuccess();
 
