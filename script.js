@@ -1,34 +1,70 @@
+
 // Global Variables
 let currentVideoData = null;
 
-// DOM Elements
-const urlInput = document.getElementById('instagram-url');
-const downloadBtn = document.getElementById('download-btn');
-const loadingSection = document.getElementById('loading-section');
-const resultsSection = document.getElementById('results-section');
-const previewVideo = document.getElementById('preview-video');
-const resetBtn = document.getElementById('reset-btn');
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+// Component Loading Function
+async function loadComponent(elementId, componentPath) {
+    try {
+        const response = await fetch(componentPath);
+        const html = await response.text();
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerHTML = html;
+        }
+    } catch (error) {
+        console.error(`Error loading component ${componentPath}:`, error);
+    }
+}
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+    initializeComponents();
 });
 
+async function initializeComponents() {
+    // Load header and footer components
+    await loadComponent('global-header', 'header.html');
+    await loadComponent('global-footer', 'footer.html');
+    
+    // Initialize app after components are loaded
+    setTimeout(() => {
+        initializeApp();
+    }, 100);
+}
+
 function initializeApp() {
-    // Add event listeners
-    downloadBtn.addEventListener('click', handleDownload);
-    resetBtn.addEventListener('click', resetDownloader);
-    urlInput.addEventListener('input', validateInput);
-    urlInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleDownload();
-        }
-    });
+    // Get DOM elements after they're loaded
+    const urlInput = document.getElementById('instagram-url');
+    const downloadBtn = document.getElementById('download-btn');
+    const loadingSection = document.getElementById('loading-section');
+    const resultsSection = document.getElementById('results-section');
+    const previewVideo = document.getElementById('preview-video');
+    const resetBtn = document.getElementById('reset-btn');
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+
+    // Only add event listeners if elements exist
+    if (downloadBtn && urlInput) {
+        downloadBtn.addEventListener('click', handleDownload);
+        urlInput.addEventListener('input', validateInput);
+        urlInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleDownload();
+            }
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetDownloader);
+    }
 
     // Mobile navigation
-    hamburger.addEventListener('click', toggleMobileNav);
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+    }
 
     // Quality button event listeners
     document.querySelectorAll('.quality-btn').forEach(btn => {
@@ -53,12 +89,12 @@ function initializeApp() {
     });
 }
 
-function toggleMobileNav() {
-    navMenu.classList.toggle('active');
-    hamburger.classList.toggle('active');
-}
-
 function validateInput() {
+    const urlInput = document.getElementById('instagram-url');
+    const downloadBtn = document.getElementById('download-btn');
+    
+    if (!urlInput || !downloadBtn) return;
+    
     const url = urlInput.value.trim();
     const isValidInstagramUrl = isValidInstagramURL(url);
 
@@ -77,6 +113,9 @@ function isValidInstagramURL(url) {
 }
 
 async function handleDownload() {
+    const urlInput = document.getElementById('instagram-url');
+    if (!urlInput) return;
+    
     const url = urlInput.value.trim();
 
     if (!isValidInstagramURL(url)) {
@@ -118,32 +157,60 @@ function simulateVideoProcessing(url) {
 }
 
 function showLoading() {
-    downloadBtn.disabled = true;
-    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    loadingSection.style.display = 'block';
-    resultsSection.style.display = 'none';
+    const downloadBtn = document.getElementById('download-btn');
+    const loadingSection = document.getElementById('loading-section');
+    const resultsSection = document.getElementById('results-section');
+    
+    if (downloadBtn) {
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    }
+    
+    if (loadingSection) {
+        loadingSection.style.display = 'block';
+    }
+    
+    if (resultsSection) {
+        resultsSection.style.display = 'none';
+    }
+    
     clearError();
 }
 
 function hideLoading() {
-    downloadBtn.disabled = false;
-    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
-    loadingSection.style.display = 'none';
+    const downloadBtn = document.getElementById('download-btn');
+    const loadingSection = document.getElementById('loading-section');
+    
+    if (downloadBtn) {
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+    }
+    
+    if (loadingSection) {
+        loadingSection.style.display = 'none';
+    }
 }
 
 function showResults(videoData) {
     hideLoading();
 
+    const previewVideo = document.getElementById('preview-video');
+    const resultsSection = document.getElementById('results-section');
+
     // Set video preview
-    previewVideo.src = videoData.videoUrl;
-    previewVideo.poster = videoData.thumbnail;
+    if (previewVideo) {
+        previewVideo.src = videoData.videoUrl;
+        previewVideo.poster = videoData.thumbnail;
+    }
 
     // Show results section with animation
-    resultsSection.style.display = 'block';
-    resultsSection.style.animation = 'fadeInUp 0.6s ease-out';
-
-    // Scroll to results
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+    if (resultsSection) {
+        resultsSection.style.display = 'block';
+        resultsSection.style.animation = 'fadeInUp 0.6s ease-out';
+        
+        // Scroll to results
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 function downloadVideo(quality) {
@@ -164,17 +231,31 @@ function downloadVideo(quality) {
 }
 
 function resetDownloader() {
-    urlInput.value = '';
+    const urlInput = document.getElementById('instagram-url');
+    const loadingSection = document.getElementById('loading-section');
+    const resultsSection = document.getElementById('results-section');
+    const downloadBtn = document.getElementById('download-btn');
+    
+    if (urlInput) urlInput.value = '';
+    
     currentVideoData = null;
-    loadingSection.style.display = 'none';
-    resultsSection.style.display = 'none';
-    downloadBtn.disabled = false;
-    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+    
+    if (loadingSection) loadingSection.style.display = 'none';
+    if (resultsSection) resultsSection.style.display = 'none';
+    
+    if (downloadBtn) {
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+    }
+    
     clearError();
     clearSuccess();
 
     // Scroll back to top
-    document.querySelector('.hero-section').scrollIntoView({ behavior: 'smooth' });
+    const heroSection = document.querySelector('.hero-section');
+    if (heroSection) {
+        heroSection.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 function showError(message) {
@@ -184,9 +265,10 @@ function showError(message) {
     errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
 
     const downloaderCard = document.querySelector('.downloader-card');
-    downloaderCard.appendChild(errorDiv);
-
-    setTimeout(clearError, 5000);
+    if (downloaderCard) {
+        downloaderCard.appendChild(errorDiv);
+        setTimeout(clearError, 5000);
+    }
 }
 
 function clearError() {
@@ -203,9 +285,10 @@ function showSuccess(message) {
     successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
 
     const downloaderCard = document.querySelector('.downloader-card');
-    downloaderCard.appendChild(successDiv);
-
-    setTimeout(clearSuccess, 5000);
+    if (downloaderCard) {
+        downloaderCard.appendChild(successDiv);
+        setTimeout(clearSuccess, 5000);
+    }
 }
 
 function clearSuccess() {
@@ -381,115 +464,3 @@ window.GlobalDownloader = {
         downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
     }
 };
-
-// Global Header and Footer Functions
-window.GlobalComponents = {
-    // Function to create global header on any page
-    createHeader: function(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const headerHTML = `
-            <header class="global-header">
-                <nav class="nav-container">
-                    <div class="logo">
-                        <i class="fab fa-instagram"></i>
-                        <span>SaveRig</span>
-                    </div>
-                    <ul class="nav-menu">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                    </ul>
-                    <div class="hamburger">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </nav>
-            </header>
-        `;
-
-        container.innerHTML = headerHTML;
-
-        // Initialize mobile navigation
-        const hamburger = container.querySelector('.hamburger');
-        const navMenu = container.querySelector('.nav-menu');
-
-        hamburger.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-    },
-
-    // Function to create global footer on any page
-    createFooter: function(containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        const footerHTML = `
-            <footer class="global-footer">
-                <div class="container">
-                    <div class="footer-content">
-                        <div class="footer-section">
-                            <div class="footer-logo">
-                                <i class="fab fa-instagram"></i>
-                                <span>SaveRig</span>
-                            </div>
-                            <p>The fastest and most reliable Instagram video downloader. Download videos, reels, and IGTV content for free.</p>
-                        </div>
-                        <div class="footer-section">
-                            <h4>Quick Links</h4>
-                            <ul>
-                                <li><a href="#home">Home</a></li>
-                                <li><a href="#how-it-works">How It Works</a></li>
-                                <li><a href="#features">Features</a></li>
-                                <li><a href="#faq">FAQ</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-section">
-                            <h4>Legal</h4>
-                            <ul>
-                                <li><a href="/privacy">Privacy Policy</a></li>
-                                <li><a href="/terms">Terms of Service</a></li>
-                                <li><a href="/disclaimer">Disclaimer</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-section">
-                            <h4>Support</h4>
-                            <ul>
-                                <li><a href="/contact">Contact Us</a></li>
-                                <li><a href="/help">Help Center</a></li>
-                                <li><a href="/report">Report Issue</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="footer-bottom">
-                        <p>&copy; 2024 InstaDownloader. All rights reserved. Made with ❤️ on Replit</p>
-                    </div>
-                </div>
-            </footer>
-        `;
-
-        container.innerHTML = footerHTML;
-    }
-};
-
-// Auto-initialize components if containers exist
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-create header if container exists
-    if (document.getElementById('global-header-container')) {
-        GlobalComponents.createHeader('global-header-container');
-    }
-
-    // Auto-create footer if container exists
-    if (document.getElementById('global-footer-container')) {
-        GlobalComponents.createFooter('global-footer-container');
-    }
-
-    // Auto-create downloader if container exists
-    if (document.getElementById('global-downloader-container')) {
-        GlobalDownloader.createDownloader('global-downloader-container');
-    }
-});
