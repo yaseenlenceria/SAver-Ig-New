@@ -287,6 +287,8 @@ function showInstantPreview() {
     const previewPanel = document.querySelector('.instant-preview-panel');
     if (previewPanel) {
         const thumbnail = previewPanel.querySelector('.thumbnail-placeholder');
+        const previewInfo = previewPanel.querySelector('.preview-info h4');
+        
         thumbnail.innerHTML = `
             <div class="loading-thumbnail">
                 <div class="mini-spinner"></div>
@@ -294,14 +296,22 @@ function showInstantPreview() {
             </div>
         `;
         
-        // Simulate loading preview
+        if (previewInfo) {
+            previewInfo.textContent = 'Loading Instagram content...';
+        }
+        
+        // Simulate loading preview with Instagram branding
         setTimeout(() => {
             thumbnail.innerHTML = `
-                <img src="https://via.placeholder.com/120x120/667eea/ffffff?text=IG" alt="Preview">
-                <div class="preview-overlay">
-                    <i class="fas fa-play-circle"></i>
+                <div class="instagram-preview">
+                    <i class="fab fa-instagram"></i>
+                    <span>Ready to download</span>
                 </div>
             `;
+            
+            if (previewInfo) {
+                previewInfo.textContent = 'Instagram content detected!';
+            }
         }, 1500);
     }
 }
@@ -311,11 +321,22 @@ function validateInput() {
 }
 
 function isValidInstagramURL(url) {
+    // Enhanced Instagram URL validation
     const instagramRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/(p|reel|tv|stories)\/[A-Za-z0-9_-]+/;
-    const usernameRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/[A-Za-z0-9_.]+\/?$/;
-    const simpleUsernameRegex = /^[A-Za-z0-9_.]+$/;
+    const profileRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/[A-Za-z0-9_.]+\/?$/;
+    const simpleUsernameRegex = /^[A-Za-z0-9_.]{1,30}$/;
     
-    return instagramRegex.test(url) || usernameRegex.test(url) || simpleUsernameRegex.test(url);
+    // Check if it's a direct Instagram URL
+    if (instagramRegex.test(url) || profileRegex.test(url)) {
+        return true;
+    }
+    
+    // Check if it's just a username (for stories)
+    if (simpleUsernameRegex.test(url) && !url.includes('.') && !url.includes('/')) {
+        return true;
+    }
+    
+    return false;
 }
 
 async function handleDownload() {
@@ -332,53 +353,50 @@ async function handleDownload() {
     showLoading();
 
     try {
-        // Use a free Instagram API service
-        const response = await fetch(`https://api.instagram-scraper.com/v1/media?url=${encodeURIComponent(url)}`, {
+        // Use RapidAPI Instagram downloader
+        const apiUrl = `https://instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com/get-info-rapidapi?url=${encodeURIComponent(url)}`;
+        
+        const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
+                'X-RapidAPI-Host': 'instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com',
+                'X-RapidAPI-Key': '283119aedfmshffa8f1a9f45aaaap11bf82jsnfaefce947ca9'
             }
         });
 
         if (!response.ok) {
-            // Fallback to alternative free API
-            const fallbackResponse = await fetch(`https://api.insta-downloader.com/download?url=${encodeURIComponent(url)}`);
-            
-            if (!fallbackResponse.ok) {
-                throw new Error('Failed to fetch Instagram content');
-            }
-            
-            const data = await fallbackResponse.json();
-            const videoData = {
-                videoUrl: data.video_url || data.url,
-                thumbnail: data.thumbnail || data.image,
-                title: data.title || 'Instagram Content',
-                duration: data.duration || 'Unknown'
-            };
-            
-            currentVideoData = videoData;
-            showResults(videoData);
-        } else {
-            const data = await response.json();
-            const videoData = {
-                videoUrl: data.video_url || data.url,
-                thumbnail: data.thumbnail || data.image,
-                title: data.title || 'Instagram Content',
-                duration: data.duration || 'Unknown'
-            };
-            
-            currentVideoData = videoData;
-            showResults(videoData);
+            throw new Error(`API Error: ${response.status}`);
         }
+
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error('Failed to fetch Instagram content');
+        }
+
+        const videoData = {
+            videoUrl: data.download_url,
+            thumbnail: data.thumb,
+            title: data.caption ? data.caption.substring(0, 100) + '...' : 'Instagram Content',
+            duration: data.duration || 'Unknown',
+            type: data.type,
+            shortcode: data.shortcode
+        };
+        
+        currentVideoData = videoData;
+        showResults(videoData);
 
     } catch (error) {
         hideLoading();
-        // If APIs fail, use client-side method
-        try {
-            await clientSideDownload(url);
-        } catch (clientError) {
+        console.error('Download error:', error);
+        
+        // Show more specific error messages
+        if (error.message.includes('API Error')) {
+            showError('Service temporarily unavailable. Please try again in a moment.');
+        } else if (error.message.includes('Failed to fetch')) {
+            showError('Network error. Please check your connection and try again.');
+        } else {
             showError('Unable to download this Instagram content. Please try another URL or check if the post is public.');
-            console.error('Download error:', error, clientError);
         }
     }
 }
@@ -533,9 +551,31 @@ function showResults(videoData) {
     const resultsSection = document.getElementById('results-section');
 
     // Set video preview
-    if (previewVideo) {
-        previewVideo.src = videoData.videoUrl;
-        previewVideo.poster = videoData.thumbnail;
+    if (previewVideo && videoData.videoUrl) {
+        if (videoData.type === 'video') {
+            previewVideo.src = videoData.videoUrl;
+            previewVideo.poster = videoData.thumbnail;
+            previewVideo.style.display = 'block';
+        } else {
+            // For photos, create an image element
+            previewVideo.style.display = 'none';
+            const imagePreview = resultsSection.querySelector('.image-preview') || document.createElement('div');
+            imagePreview.className = 'image-preview';
+            imagePreview.innerHTML = `<img src="${videoData.videoUrl || videoData.thumbnail}" alt="Instagram content" style="max-width: 100%; border-radius: 10px;">`;
+            
+            if (!resultsSection.querySelector('.image-preview')) {
+                const videoPreviewContainer = resultsSection.querySelector('.video-preview');
+                if (videoPreviewContainer) {
+                    videoPreviewContainer.appendChild(imagePreview);
+                }
+            }
+        }
+    }
+
+    // Update download options based on content type
+    const downloadOptions = resultsSection.querySelector('.download-options h3');
+    if (downloadOptions) {
+        downloadOptions.textContent = videoData.type === 'video' ? 'Video Download Options' : 'Photo Download Options';
     }
 
     // Show results section with animation
@@ -546,6 +586,9 @@ function showResults(videoData) {
         // Scroll to results
         resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
+
+    // Show success message
+    showSuccess(`${videoData.type === 'video' ? 'Video' : 'Photo'} ready for download!`);
 }
 
 function downloadVideo(quality) {
@@ -554,15 +597,21 @@ function downloadVideo(quality) {
     // Create download link
     const link = document.createElement('a');
     link.href = currentVideoData.videoUrl;
-    link.download = `instagram_video_${quality}.mp4`;
+    
+    // Set appropriate filename based on content type
+    const fileExtension = currentVideoData.type === 'video' ? 'mp4' : 'jpg';
+    const contentType = currentVideoData.type === 'video' ? 'video' : 'photo';
+    link.download = `instagram_${contentType}_${quality}.${fileExtension}`;
+    
     link.style.display = 'none';
+    link.target = '_blank';
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 
     // Show success message
-    showSuccess(`Video download started in ${quality.toUpperCase()} quality!`);
+    showSuccess(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} download started in ${quality.toUpperCase()} quality!`);
 }
 
 function resetDownloader() {
