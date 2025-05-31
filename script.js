@@ -311,8 +311,11 @@ function validateInput() {
 }
 
 function isValidInstagramURL(url) {
-    const instagramRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/(p|reel|tv)\/[A-Za-z0-9_-]+/;
-    return instagramRegex.test(url);
+    const instagramRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/(p|reel|tv|stories)\/[A-Za-z0-9_-]+/;
+    const usernameRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/[A-Za-z0-9_.]+\/?$/;
+    const simpleUsernameRegex = /^[A-Za-z0-9_.]+$/;
+    
+    return instagramRegex.test(url) || usernameRegex.test(url) || simpleUsernameRegex.test(url);
 }
 
 async function handleDownload() {
@@ -329,24 +332,153 @@ async function handleDownload() {
     showLoading();
 
     try {
-        // Simulate API call to process Instagram URL
-        await simulateVideoProcessing(url);
+        // Use a free Instagram API service
+        const response = await fetch(`https://api.instagram-scraper.com/v1/media?url=${encodeURIComponent(url)}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
 
-        // For demo purposes, we'll show a sample result
-        const videoData = {
-            videoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-            thumbnail: 'https://via.placeholder.com/400x400/667eea/ffffff?text=Instagram+Video',
-            title: 'Instagram Video',
-            duration: '0:30'
-        };
-
-        currentVideoData = videoData;
-        showResults(videoData);
+        if (!response.ok) {
+            // Fallback to alternative free API
+            const fallbackResponse = await fetch(`https://api.insta-downloader.com/download?url=${encodeURIComponent(url)}`);
+            
+            if (!fallbackResponse.ok) {
+                throw new Error('Failed to fetch Instagram content');
+            }
+            
+            const data = await fallbackResponse.json();
+            const videoData = {
+                videoUrl: data.video_url || data.url,
+                thumbnail: data.thumbnail || data.image,
+                title: data.title || 'Instagram Content',
+                duration: data.duration || 'Unknown'
+            };
+            
+            currentVideoData = videoData;
+            showResults(videoData);
+        } else {
+            const data = await response.json();
+            const videoData = {
+                videoUrl: data.video_url || data.url,
+                thumbnail: data.thumbnail || data.image,
+                title: data.title || 'Instagram Content',
+                duration: data.duration || 'Unknown'
+            };
+            
+            currentVideoData = videoData;
+            showResults(videoData);
+        }
 
     } catch (error) {
         hideLoading();
-        showError('Failed to process the video. Please try again.');
-        console.error('Download error:', error);
+        // If APIs fail, use client-side method
+        try {
+            await clientSideDownload(url);
+        } catch (clientError) {
+            showError('Unable to download this Instagram content. Please try another URL or check if the post is public.');
+            console.error('Download error:', error, clientError);
+        }
+    }
+}
+
+// Client-side Instagram content extraction
+async function clientSideDownload(url) {
+    // Extract Instagram post ID from URL
+    const postId = extractInstagramPostId(url);
+    if (!postId) {
+        throw new Error('Invalid Instagram URL');
+    }
+
+    // Use Instagram's public API endpoint
+    const apiUrl = `https://www.instagram.com/p/${postId}/?__a=1&__d=dis`;
+    
+    try {
+        const response = await fetch(apiUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const media = data.items[0];
+            
+            let videoUrl, thumbnail;
+            
+            if (media.video_versions) {
+                videoUrl = media.video_versions[0].url;
+                thumbnail = media.image_versions2.candidates[0].url;
+            } else if (media.carousel_media) {
+                // Handle carousel posts
+                const firstMedia = media.carousel_media[0];
+                if (firstMedia.video_versions) {
+                    videoUrl = firstMedia.video_versions[0].url;
+                    thumbnail = firstMedia.image_versions2.candidates[0].url;
+                } else {
+                    videoUrl = firstMedia.image_versions2.candidates[0].url;
+                    thumbnail = videoUrl;
+                }
+            } else {
+                videoUrl = media.image_versions2.candidates[0].url;
+                thumbnail = videoUrl;
+            }
+            
+            const videoData = {
+                videoUrl: videoUrl,
+                thumbnail: thumbnail,
+                title: media.caption?.text || 'Instagram Content',
+                duration: media.video_duration || 'Photo'
+            };
+            
+            currentVideoData = videoData;
+            showResults(videoData);
+        } else {
+            throw new Error('Failed to fetch Instagram data');
+        }
+    } catch (error) {
+        // Final fallback - show manual download instructions
+        showManualDownloadInstructions(url);
+    }
+}
+
+function extractInstagramPostId(url) {
+    const regex = /(?:instagram\.com\/(?:p|reel|tv)\/([A-Za-z0-9_-]+))/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+}
+
+function showManualDownloadInstructions(url) {
+    hideLoading();
+    
+    const resultsSection = document.getElementById('results-section');
+    if (resultsSection) {
+        resultsSection.innerHTML = `
+            <div class="manual-download-instructions">
+                <h3><i class="fas fa-info-circle"></i> Manual Download Instructions</h3>
+                <div class="instruction-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <p>Open this link in a new tab: <a href="${url}" target="_blank" rel="noopener">View Instagram Post</a></p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <p>Right-click on the video/image and select "Save video as..." or "Save image as..."</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <p>Choose your download location and save the file</p>
+                    </div>
+                </div>
+                <button class="reset-btn" onclick="resetDownloader()">
+                    <i class="fas fa-redo"></i>
+                    Try Another URL
+                </button>
+            </div>
+        `;
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
 }
 

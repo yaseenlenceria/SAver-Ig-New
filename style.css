@@ -986,23 +986,68 @@ main {
 
 /* Success and Error States */
 .success-message {
-    background: linear-gradient(45deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #00c851, #00ff88);
     color: white;
     padding: 1rem;
     border-radius: 10px;
-    margin: 1rem 0;
+    margin-top: 1rem;
     text-align: center;
-    animation: slideInUp 0.3s ease;
+    animation: fadeInUp 0.5s ease-out;
 }
 
-.error-message {
-    background: linear-gradient(45deg, #dc3545, #c82333);
-    color: white;
-    padding: 1rem;
-    border-radius: 10px;
-    margin: 1rem 0;
+.manual-download-instructions {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
     text-align: center;
-    animation: slideInUp 0.3s ease;
+    color: white;
+}
+
+.manual-download-instructions h3 {
+    color: #ffd700;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+}
+
+.instruction-steps {
+    margin: 2rem 0;
+}
+
+.instruction-steps .step {
+    display: flex;
+    align-items: center;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.instruction-steps .step-number {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.instruction-steps p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.instruction-steps a {
+    color: #ffd700;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.instruction-steps a:hover {
+    text-decoration: underline;
 }
 
 @keyframes slideInUp {
