@@ -1,16 +1,206 @@
+
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Video Downloader - Download Instagram Videos & Reels Free</title>
+    <meta name="description" content="Free Instagram video downloader tool. Download Instagram videos, reels, and IGTV content in high quality. Fast, secure, and easy to use.">
+    <meta name="keywords" content="instagram video downloader, download instagram videos, instagram reels downloader, IGTV downloader, free video downloader">
+    <meta name="author" content="Instagram Video Downloader">
+    <meta property="og:title" content="Instagram Video Downloader - Free & Fast">
+    <meta property="og:description" content="Download Instagram videos and reels in high quality for free. Simple, fast, and secure.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Instagram Video Downloader">
+    <meta name="twitter:description" content="Free tool to download Instagram videos and reels">
+    <link rel="canonical" href="https://your-domain.com">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-
 <body>
-  Hello world
-  <script src="script.js"></script>
-</body>
+    <!-- Global Header -->
+    <header class="global-header">
+        <nav class="nav-container">
+            <div class="logo">
+                <i class="fab fa-instagram"></i>
+                <span>InstaDownloader</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
 
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="container">
+                <h1>Instagram Video Downloader</h1>
+                <p class="hero-subtitle">Download Instagram videos, reels, and IGTV content in high quality - completely free!</p>
+                
+                <!-- Global Downloader Component -->
+                <div class="downloader-container">
+                    <div class="downloader-card">
+                        <div class="input-section">
+                            <div class="input-wrapper">
+                                <i class="fab fa-instagram input-icon"></i>
+                                <input type="url" id="instagram-url" placeholder="Paste Instagram video URL here..." class="url-input">
+                                <button id="download-btn" class="download-btn">
+                                    <i class="fas fa-download"></i>
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Loading State -->
+                        <div class="loading-section" id="loading-section" style="display: none;">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                            <p class="loading-text">Processing your Instagram video...</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Results Section -->
+                        <div class="results-section" id="results-section" style="display: none;">
+                            <div class="video-preview">
+                                <video id="preview-video" controls poster="">
+                                    <source src="" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="download-options">
+                                <h3>Download Options</h3>
+                                <div class="quality-buttons">
+                                    <button class="quality-btn" data-quality="hd">
+                                        <i class="fas fa-video"></i>
+                                        HD Quality
+                                    </button>
+                                    <button class="quality-btn" data-quality="sd">
+                                        <i class="fas fa-mobile-alt"></i>
+                                        Mobile Quality
+                                    </button>
+                                </div>
+                                <button class="reset-btn" id="reset-btn">
+                                    <i class="fas fa-redo"></i>
+                                    Download Another Video
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section" id="features">
+            <div class="container">
+                <h2>Why Choose Our Instagram Downloader?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Lightning Fast</h3>
+                        <p>Download Instagram videos in seconds with our optimized servers</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-hd-video"></i>
+                        <h3>High Quality</h3>
+                        <p>Get videos in the highest available quality, up to 1080p HD</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>100% Safe</h3>
+                        <p>No malware, no registration required. Your privacy is protected</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Mobile Friendly</h3>
+                        <p>Works perfectly on all devices - desktop, tablet, and mobile</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section class="how-it-works-section" id="how-it-works">
+            <div class="container">
+                <h2>How It Works</h2>
+                <div class="steps-container">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Copy URL</h3>
+                        <p>Copy the Instagram video URL from your browser or app</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Paste & Process</h3>
+                        <p>Paste the URL in our downloader and click download</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Download</h3>
+                        <p>Choose your preferred quality and download the video</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="global-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fab fa-instagram"></i>
+                        <span>InstaDownloader</span>
+                    </div>
+                    <p>The fastest and most reliable Instagram video downloader. Download videos, reels, and IGTV content for free.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                        <li><a href="/disclaimer">Disclaimer</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="/contact">Contact Us</a></li>
+                        <li><a href="/help">Help Center</a></li>
+                        <li><a href="/report">Report Issue</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 InstaDownloader. All rights reserved. Made with ❤️ on Replit</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>
