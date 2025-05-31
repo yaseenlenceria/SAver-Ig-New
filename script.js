@@ -17,11 +17,6 @@ async function loadComponent(elementId, componentPath) {
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', function() {
-    // Fix for addEventListener error
-    if (!document.getElementById('global-header')) {
-        console.warn('Global header element not found');
-        return;
-    }
     initializeComponents();
 });
 
@@ -50,7 +45,8 @@ function initializeApp() {
     // Only add event listeners if elements exist
     if (downloadBtn && urlInput) {
         downloadBtn.addEventListener('click', handleDownload);
-        urlInput.addEventListener('input', validateInput);
+        urlInput.addEventListener('input', handleInputChange);
+        urlInput.addEventListener('paste', handlePaste);
         urlInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 handleDownload();
@@ -204,9 +200,10 @@ function initializeApp() {
     }
 }
 
-function validateInput() {
+function handleInputChange() {
     const urlInput = document.getElementById('instagram-url');
     const downloadBtn = document.getElementById('download-btn');
+    const downloaderCard = document.querySelector('.downloader-card');
 
     if (!urlInput || !downloadBtn) return;
 
@@ -215,11 +212,102 @@ function validateInput() {
 
     downloadBtn.disabled = !isValidInstagramUrl;
 
-    if (url && !isValidInstagramUrl) {
+    if (url && isValidInstagramUrl) {
+        downloaderCard.classList.add('has-valid-url');
+        showPreviewPanel();
+        clearError();
+    } else if (url && !isValidInstagramUrl) {
+        downloaderCard.classList.remove('has-valid-url');
+        hidePreviewPanel();
         showError('Please enter a valid Instagram URL');
     } else {
+        downloaderCard.classList.remove('has-valid-url');
+        hidePreviewPanel();
         clearError();
     }
+}
+
+function handlePaste(e) {
+    setTimeout(() => {
+        handleInputChange();
+        const urlInput = document.getElementById('instagram-url');
+        if (urlInput && isValidInstagramURL(urlInput.value.trim())) {
+            showInstantPreview();
+        }
+    }, 100);
+}
+
+function showPreviewPanel() {
+    const downloaderCard = document.querySelector('.downloader-card');
+    let previewPanel = downloaderCard.querySelector('.instant-preview-panel');
+    
+    if (!previewPanel) {
+        previewPanel = document.createElement('div');
+        previewPanel.className = 'instant-preview-panel';
+        previewPanel.innerHTML = `
+            <div class="preview-content">
+                <div class="preview-thumbnail">
+                    <div class="thumbnail-placeholder">
+                        <i class="fab fa-instagram"></i>
+                        <span>Content Preview</span>
+                    </div>
+                </div>
+                <div class="preview-info">
+                    <h4>Ready to Download</h4>
+                    <p>Click download to get your Instagram content</p>
+                    <div class="preview-actions">
+                        <button class="instant-download-btn" onclick="handleDownload()">
+                            <i class="fas fa-download"></i>
+                            Download Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        downloaderCard.appendChild(previewPanel);
+    }
+    
+    previewPanel.style.display = 'block';
+    setTimeout(() => {
+        previewPanel.classList.add('show');
+    }, 10);
+}
+
+function hidePreviewPanel() {
+    const previewPanel = document.querySelector('.instant-preview-panel');
+    if (previewPanel) {
+        previewPanel.classList.remove('show');
+        setTimeout(() => {
+            previewPanel.style.display = 'none';
+        }, 300);
+    }
+}
+
+function showInstantPreview() {
+    const previewPanel = document.querySelector('.instant-preview-panel');
+    if (previewPanel) {
+        const thumbnail = previewPanel.querySelector('.thumbnail-placeholder');
+        thumbnail.innerHTML = `
+            <div class="loading-thumbnail">
+                <div class="mini-spinner"></div>
+                <span>Loading preview...</span>
+            </div>
+        `;
+        
+        // Simulate loading preview
+        setTimeout(() => {
+            thumbnail.innerHTML = `
+                <img src="https://via.placeholder.com/120x120/667eea/ffffff?text=IG" alt="Preview">
+                <div class="preview-overlay">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+            `;
+        }, 1500);
+    }
+}
+
+function validateInput() {
+    handleInputChange();
 }
 
 function isValidInstagramURL(url) {
