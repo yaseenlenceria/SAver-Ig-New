@@ -58,6 +58,18 @@ function initializeApp() {
         resetBtn.addEventListener('click', resetDownloader);
     }
 
+    // Re-initialize quality buttons after components load
+    setTimeout(() => {
+        const qualityButtons = document.querySelectorAll('.quality-btn');
+        if (qualityButtons.length > 0) {
+            qualityButtons.forEach(btn => {
+                // Remove existing listeners to prevent duplicates
+                btn.removeEventListener('click', handleQualityClick);
+                btn.addEventListener('click', handleQualityClick);
+            });
+        }
+    }, 200);
+
     // Mobile navigation
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
@@ -66,16 +78,20 @@ function initializeApp() {
         });
     }
 
-    // Quality button event listeners
+    // Quality button event listeners - will be re-initialized after component load
     const qualityButtons = document.querySelectorAll('.quality-btn');
     if (qualityButtons.length > 0) {
         qualityButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const quality = this.dataset.quality;
-                downloadVideo(quality);
-            });
+            btn.addEventListener('click', handleQualityClick);
         });
     }
+}
+
+// Separate handler function for quality buttons
+function handleQualityClick() {
+    const quality = this.dataset.quality;
+    downloadVideo(quality);
+}
 
     // Dropdown navigation handling
     const dropdownToggles = document.querySelectorAll('.nav-dropdown-toggle');
@@ -587,6 +603,11 @@ function showResults(videoData) {
         resultsSection.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // Automatically start download after showing results
+    setTimeout(() => {
+        downloadVideo('hd'); // Auto-download in HD quality
+    }, 1000);
+
     // Show success message
     showSuccess(`${videoData.type === 'video' ? 'Video' : 'Photo'} ready for download!`);
 }
@@ -594,24 +615,48 @@ function showResults(videoData) {
 function downloadVideo(quality) {
     if (!currentVideoData) return;
 
-    // Create download link
-    const link = document.createElement('a');
-    link.href = currentVideoData.videoUrl;
-    
-    // Set appropriate filename based on content type
-    const fileExtension = currentVideoData.type === 'video' ? 'mp4' : 'jpg';
-    const contentType = currentVideoData.type === 'video' ? 'video' : 'photo';
-    link.download = `instagram_${contentType}_${quality}.${fileExtension}`;
-    
-    link.style.display = 'none';
-    link.target = '_blank';
+    try {
+        // Create download link
+        const link = document.createElement('a');
+        link.href = currentVideoData.videoUrl;
+        
+        // Set appropriate filename based on content type
+        const fileExtension = currentVideoData.type === 'video' ? 'mp4' : 'jpg';
+        const contentType = currentVideoData.type === 'video' ? 'video' : 'photo';
+        const timestamp = new Date().getTime();
+        link.download = `instagram_${contentType}_${quality}_${timestamp}.${fileExtension}`;
+        
+        // Force download attributes
+        link.setAttribute('download', link.download);
+        link.setAttribute('target', '_blank');
+        link.style.display = 'none';
 
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        // Add to DOM and trigger download
+        document.body.appendChild(link);
+        
+        // Trigger the download immediately
+        link.click();
+        
+        // Clean up
+        setTimeout(() => {
+            if (document.body.contains(link)) {
+                document.body.removeChild(link);
+            }
+        }, 100);
 
-    // Show success message
-    showSuccess(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} download started in ${quality.toUpperCase()} quality!`);
+        // Show success message
+        const capitalizedType = contentType.charAt(0).toUpperCase() + contentType.slice(1);
+        showSuccess(`${capitalizedType} download started in ${quality.toUpperCase()} quality! Check your Downloads folder.`);
+
+        // Track download
+        if (typeof trackUserInteraction === 'function') {
+            trackUserInteraction('download_completed', `${contentType}_${quality}`);
+        }
+
+    } catch (error) {
+        console.error('Download error:', error);
+        showError('Download failed. Please try again or right-click the video and select "Save as..."');
+    }
 }
 
 function resetDownloader() {
