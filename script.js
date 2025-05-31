@@ -240,7 +240,7 @@ function handlePaste(e) {
 function showPreviewPanel() {
     const downloaderCard = document.querySelector('.downloader-card');
     let previewPanel = downloaderCard.querySelector('.instant-preview-panel');
-    
+
     if (!previewPanel) {
         previewPanel = document.createElement('div');
         previewPanel.className = 'instant-preview-panel';
@@ -266,7 +266,7 @@ function showPreviewPanel() {
         `;
         downloaderCard.appendChild(previewPanel);
     }
-    
+
     previewPanel.style.display = 'block';
     setTimeout(() => {
         previewPanel.classList.add('show');
@@ -288,18 +288,18 @@ function showInstantPreview() {
     if (previewPanel) {
         const thumbnail = previewPanel.querySelector('.thumbnail-placeholder');
         const previewInfo = previewPanel.querySelector('.preview-info h4');
-        
+
         thumbnail.innerHTML = `
             <div class="loading-thumbnail">
                 <div class="mini-spinner"></div>
                 <span>Loading preview...</span>
             </div>
         `;
-        
+
         if (previewInfo) {
             previewInfo.textContent = 'Loading Instagram content...';
         }
-        
+
         // Simulate loading preview with Instagram branding
         setTimeout(() => {
             thumbnail.innerHTML = `
@@ -308,7 +308,7 @@ function showInstantPreview() {
                     <span>Ready to download</span>
                 </div>
             `;
-            
+
             if (previewInfo) {
                 previewInfo.textContent = 'Instagram content detected!';
             }
@@ -325,17 +325,17 @@ function isValidInstagramURL(url) {
     const instagramRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/(p|reel|tv|stories)\/[A-Za-z0-9_-]+/;
     const profileRegex = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/[A-Za-z0-9_.]+\/?$/;
     const simpleUsernameRegex = /^[A-Za-z0-9_.]{1,30}$/;
-    
+
     // Check if it's a direct Instagram URL
     if (instagramRegex.test(url) || profileRegex.test(url)) {
         return true;
     }
-    
+
     // Check if it's just a username (for stories)
     if (simpleUsernameRegex.test(url) && !url.includes('.') && !url.includes('/')) {
         return true;
     }
-    
+
     return false;
 }
 
@@ -355,7 +355,7 @@ async function handleDownload() {
     try {
         // Use RapidAPI Instagram downloader
         const apiUrl = `https://instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com/get-info-rapidapi?url=${encodeURIComponent(url)}`;
-        
+
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
@@ -369,7 +369,7 @@ async function handleDownload() {
         }
 
         const data = await response.json();
-        
+
         if (data.error) {
             throw new Error('Failed to fetch Instagram content');
         }
@@ -382,14 +382,14 @@ async function handleDownload() {
             type: data.type,
             shortcode: data.shortcode
         };
-        
+
         currentVideoData = videoData;
         showResults(videoData);
 
     } catch (error) {
         hideLoading();
         console.error('Download error:', error);
-        
+
         // Show more specific error messages
         if (error.message.includes('API Error')) {
             showError('Service temporarily unavailable. Please try again in a moment.');
@@ -411,20 +411,20 @@ async function clientSideDownload(url) {
 
     // Use Instagram's public API endpoint
     const apiUrl = `https://www.instagram.com/p/${postId}/?__a=1&__d=dis`;
-    
+
     try {
         const response = await fetch(apiUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
         });
-        
+
         if (response.ok) {
             const data = await response.json();
             const media = data.items[0];
-            
+
             let videoUrl, thumbnail;
-            
+
             if (media.video_versions) {
                 videoUrl = media.video_versions[0].url;
                 thumbnail = media.image_versions2.candidates[0].url;
@@ -442,14 +442,14 @@ async function clientSideDownload(url) {
                 videoUrl = media.image_versions2.candidates[0].url;
                 thumbnail = videoUrl;
             }
-            
+
             const videoData = {
                 videoUrl: videoUrl,
                 thumbnail: thumbnail,
                 title: media.caption?.text || 'Instagram Content',
                 duration: media.video_duration || 'Photo'
             };
-            
+
             currentVideoData = videoData;
             showResults(videoData);
         } else {
@@ -469,7 +469,7 @@ function extractInstagramPostId(url) {
 
 function showManualDownloadInstructions(url) {
     hideLoading();
-    
+
     const resultsSection = document.getElementById('results-section');
     if (resultsSection) {
         resultsSection.innerHTML = `
@@ -562,7 +562,7 @@ function showResults(videoData) {
             const imagePreview = resultsSection.querySelector('.image-preview') || document.createElement('div');
             imagePreview.className = 'image-preview';
             imagePreview.innerHTML = `<img src="${videoData.videoUrl || videoData.thumbnail}" alt="Instagram content" style="max-width: 100%; border-radius: 10px;">`;
-            
+
             if (!resultsSection.querySelector('.image-preview')) {
                 const videoPreviewContainer = resultsSection.querySelector('.video-preview');
                 if (videoPreviewContainer) {
@@ -597,12 +597,12 @@ function downloadVideo(quality) {
     // Create download link
     const link = document.createElement('a');
     link.href = currentVideoData.videoUrl;
-    
+
     // Set appropriate filename based on content type
     const fileExtension = currentVideoData.type === 'video' ? 'mp4' : 'jpg';
     const contentType = currentVideoData.type === 'video' ? 'video' : 'photo';
     link.download = `instagram_${contentType}_${quality}.${fileExtension}`;
-    
+
     link.style.display = 'none';
     link.target = '_blank';
 
